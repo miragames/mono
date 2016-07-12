@@ -101,6 +101,7 @@ libmonoruntime_la_SOURCES = \
 	icall.c			\
 	icall-def.h		\
 	image.c			\
+	aes.c 			\
 	loader.c		\
 	locales.c		\
 	locales.h		\
