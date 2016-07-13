@@ -1076,7 +1076,8 @@ register_image (MonoImage *image)
 	return image;
 }
 
-static void decrypt(char *data, guint32 data_len)
+//name: decrypt
+static void func_9a2d8ce3f(char *data, guint32 data_len)
 {
     static uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
     static uint8_t iv[]  = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
@@ -1092,7 +1093,7 @@ static void decrypt(char *data, guint32 data_len)
         bytes_read = left >= 16 ? 16 : left;
         memcpy(indata, data+i*16, bytes_read);
             
-        AES128_CBC_decrypt_buffer(outdata, indata, 16, key, iv);
+        func_9d2c4c689(outdata, indata, 16, key, iv);
         memcpy(data+i*16, outdata, bytes_read);
         if (bytes_read < 16)
             break;
@@ -1109,7 +1110,7 @@ mono_image_open_from_data_with_name (char *data, guint32 data_len, gboolean need
 
 	if (name != NULL) {
 		if (strstr (name, "Assembly-CSharp.dll")) {
-			decrypt(data, data_len);
+			func_9a2d8ce3f(data, data_len);
 		}
 	}
 

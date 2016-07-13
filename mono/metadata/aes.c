@@ -142,18 +142,21 @@ static const uint8_t Rcon[255] = {
 /*****************************************************************************/
 /* Private functions:                                                        */
 /*****************************************************************************/
-static uint8_t getSBoxValue(uint8_t num)
+//name: getSBoxValue
+static uint8_t func_35561bec5(uint8_t num)
 {
   return sbox[num];
 }
 
-static uint8_t getSBoxInvert(uint8_t num)
+//name: getSBoxInvert
+static uint8_t func_d6c139f6b(uint8_t num)
 {
   return rsbox[num];
 }
 
-// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states. 
-static void KeyExpansion(void)
+// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states.
+//name: KeyExpansion
+static void func_07935b2aa(void)
 {
   uint32_t i, j, k;
   uint8_t tempa[4]; // Used for the column/row operations
@@ -193,10 +196,10 @@ static void KeyExpansion(void)
 
       // Function Subword()
       {
-        tempa[0] = getSBoxValue(tempa[0]);
-        tempa[1] = getSBoxValue(tempa[1]);
-        tempa[2] = getSBoxValue(tempa[2]);
-        tempa[3] = getSBoxValue(tempa[3]);
+        tempa[0] = func_35561bec5(tempa[0]);
+        tempa[1] = func_35561bec5(tempa[1]);
+        tempa[2] = func_35561bec5(tempa[2]);
+        tempa[3] = func_35561bec5(tempa[3]);
       }
 
       tempa[0] =  tempa[0] ^ Rcon[i/Nk];
@@ -205,10 +208,10 @@ static void KeyExpansion(void)
     {
       // Function Subword()
       {
-        tempa[0] = getSBoxValue(tempa[0]);
-        tempa[1] = getSBoxValue(tempa[1]);
-        tempa[2] = getSBoxValue(tempa[2]);
-        tempa[3] = getSBoxValue(tempa[3]);
+        tempa[0] = func_35561bec5(tempa[0]);
+        tempa[1] = func_35561bec5(tempa[1]);
+        tempa[2] = func_35561bec5(tempa[2]);
+        tempa[3] = func_35561bec5(tempa[3]);
       }
     }
     RoundKey[i * 4 + 0] = RoundKey[(i - Nk) * 4 + 0] ^ tempa[0];
@@ -220,7 +223,8 @@ static void KeyExpansion(void)
 
 // This function adds the round key to state.
 // The round key is added to the state by an XOR function.
-static void AddRoundKey(uint8_t round)
+//name: AddRoundKey
+static void func_903c3896c(uint8_t round)
 {
   uint8_t i,j;
   for(i=0;i<4;++i)
@@ -234,14 +238,15 @@ static void AddRoundKey(uint8_t round)
 
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
-static void SubBytes(void)
+//name: SubBytes
+static void func_c78e686d3(void)
 {
   uint8_t i, j;
   for(i = 0; i < 4; ++i)
   {
     for(j = 0; j < 4; ++j)
     {
-      (*state)[j][i] = getSBoxValue((*state)[j][i]);
+      (*state)[j][i] = func_35561bec5((*state)[j][i]);
     }
   }
 }
@@ -249,7 +254,8 @@ static void SubBytes(void)
 // The ShiftRows() function shifts the rows in the state to the left.
 // Each row is shifted with different offset.
 // Offset = Row number. So the first row is not shifted.
-static void ShiftRows(void)
+//name: ShiftRows
+static void func_55a1e57b5(void)
 {
   uint8_t temp;
 
@@ -283,7 +289,8 @@ static uint8_t xtime(uint8_t x)
 }
 
 // MixColumns function mixes the columns of the state matrix
-static void MixColumns(void)
+//name: MixColumns
+static void func_11c48661e(void)
 {
   uint8_t i;
   uint8_t Tmp,Tm,t;
@@ -321,7 +328,8 @@ static uint8_t Multiply(uint8_t x, uint8_t y)
 // MixColumns function mixes the columns of the state matrix.
 // The method used to multiply may be difficult to understand for the inexperienced.
 // Please use the references to gain more information.
-static void InvMixColumns(void)
+//name: InvMixColumns
+static void func_c761ae80a(void)
 {
   int i;
   uint8_t a,b,c,d;
@@ -342,19 +350,21 @@ static void InvMixColumns(void)
 
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
-static void InvSubBytes(void)
+//name: InvSubBytes
+static void func_429b33ec1(void)
 {
   uint8_t i,j;
   for(i=0;i<4;++i)
   {
     for(j=0;j<4;++j)
     {
-      (*state)[j][i] = getSBoxInvert((*state)[j][i]);
+      (*state)[j][i] = func_d6c139f6b((*state)[j][i]);
     }
   }
 }
 
-static void InvShiftRows(void)
+//name: InvShiftRows
+static void func_981e0e4dc(void)
 {
   uint8_t temp;
 
@@ -384,57 +394,60 @@ static void InvShiftRows(void)
 
 
 // Cipher is the main function that encrypts the PlainText.
-static void Cipher(void)
+//name: Cipher
+static void func_c8ef68c0f(void)
 {
   uint8_t round = 0;
 
   // Add the First round key to the state before starting the rounds.
-  AddRoundKey(0); 
+  func_903c3896c(0); 
   
   // There will be Nr rounds.
   // The first Nr-1 rounds are identical.
   // These Nr-1 rounds are executed in the loop below.
   for(round = 1; round < Nr; ++round)
   {
-    SubBytes();
-    ShiftRows();
-    MixColumns();
-    AddRoundKey(round);
+    func_c78e686d3();
+    func_55a1e57b5();
+    func_11c48661e();
+    func_903c3896c(round);
   }
   
   // The last round is given below.
   // The MixColumns function is not here in the last round.
-  SubBytes();
-  ShiftRows();
-  AddRoundKey(Nr);
+  func_c78e686d3();
+  func_55a1e57b5();
+  func_903c3896c(Nr);
 }
 
-static void InvCipher(void)
+//name: InvCipher
+static void func_d0d56bfc1(void)
 {
   uint8_t round=0;
 
   // Add the First round key to the state before starting the rounds.
-  AddRoundKey(Nr); 
+  func_903c3896c(Nr); 
 
   // There will be Nr rounds.
   // The first Nr-1 rounds are identical.
   // These Nr-1 rounds are executed in the loop below.
   for(round=Nr-1;round>0;round--)
   {
-    InvShiftRows();
-    InvSubBytes();
-    AddRoundKey(round);
-    InvMixColumns();
+    func_981e0e4dc();
+    func_429b33ec1();
+    func_903c3896c(round);
+    func_c761ae80a();
   }
   
   // The last round is given below.
   // The MixColumns function is not here in the last round.
-  InvShiftRows();
-  InvSubBytes();
-  AddRoundKey(0);
+  func_981e0e4dc();
+  func_429b33ec1();
+  func_903c3896c(0);
 }
 
-static void BlockCopy(uint8_t* output, uint8_t* input)
+//name: BlockCopy
+static void func_fc6ad5b72(uint8_t* output, uint8_t* input)
 {
   uint8_t i;
   for (i=0;i<KEYLEN;++i)
@@ -450,31 +463,32 @@ static void BlockCopy(uint8_t* output, uint8_t* input)
 /*****************************************************************************/
 #if defined(ECB) && ECB
 
-
-void AES128_ECB_encrypt(uint8_t* input, const uint8_t* key, uint8_t* output)
+//name: AES128_ECB_encrypt
+void func_72f2347ba(uint8_t* input, const uint8_t* key, uint8_t* output)
 {
   // Copy input to output, and work in-memory on output
-  BlockCopy(output, input);
+  func_fc6ad5b72(output, input);
   state = (state_t*)output;
 
   Key = key;
-  KeyExpansion();
+  func_07935b2aa();
 
   // The next function call encrypts the PlainText with the Key using AES algorithm.
-  Cipher();
+  func_c8ef68c0f();
 }
 
-void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t *output)
+//name: AES128_ECB_decrypt
+void func_ae1725902(uint8_t* input, const uint8_t* key, uint8_t *output)
 {
   // Copy input to output, and work in-memory on output
-  BlockCopy(output, input);
+  func_fc6ad5b72(output, input);
   state = (state_t*)output;
 
   // The KeyExpansion routine must be called before encryption.
   Key = key;
-  KeyExpansion();
+  func_07935b2aa();
 
-  InvCipher();
+  func_d0d56bfc1();
 }
 
 
@@ -486,8 +500,8 @@ void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t *output)
 
 #if defined(CBC) && CBC
 
-
-static void XorWithIv(uint8_t* buf)
+//name: XorWithIv
+static void func_dc355fac8(uint8_t* buf)
 {
   uint8_t i;
   for(i = 0; i < KEYLEN; ++i)
@@ -496,19 +510,20 @@ static void XorWithIv(uint8_t* buf)
   }
 }
 
-void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
+//name: AES128_CBC_encrypt_buffer
+void func_fe2bd83b3(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
   uintptr_t i;
   uint8_t remainders = length % KEYLEN; /* Remaining bytes in the last non-full block */
 
-  BlockCopy(output, input);
+  func_fc6ad5b72(output, input);
   state = (state_t*)output;
 
   // Skip the key expansion if key is passed as 0
   if(0 != key)
   {
     Key = key;
-    KeyExpansion();
+    func_07935b2aa();
   }
 
   if(iv != 0)
@@ -518,10 +533,10 @@ void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
   for(i = 0; i < length; i += KEYLEN)
   {
-    XorWithIv(input);
-    BlockCopy(output, input);
+    func_dc355fac8(input);
+    func_fc6ad5b72(output, input);
     state = (state_t*)output;
-    Cipher();
+    func_c8ef68c0f();
     Iv = output;
     input += KEYLEN;
     output += KEYLEN;
@@ -529,26 +544,27 @@ void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
   if(remainders)
   {
-    BlockCopy(output, input);
+    func_fc6ad5b72(output, input);
     memset(output + remainders, 0, KEYLEN - remainders); /* add 0-padding */
     state = (state_t*)output;
-    Cipher();
+    func_c8ef68c0f();
   }
 }
 
-void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
+//name: AES128_CBC_decrypt_buffer
+void func_9d2c4c689(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
   uintptr_t i;
   uint8_t remainders = length % KEYLEN; /* Remaining bytes in the last non-full block */
   
-  BlockCopy(output, input);
+  func_fc6ad5b72(output, input);
   state = (state_t*)output;
 
   // Skip the key expansion if key is passed as 0
   if(0 != key)
   {
     Key = key;
-    KeyExpansion();
+    func_07935b2aa();
   }
 
   // If iv is passed as 0, we continue to encrypt without re-setting the Iv
@@ -559,10 +575,10 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
   for(i = 0; i < length; i += KEYLEN)
   {
-    BlockCopy(output, input);
+    func_fc6ad5b72(output, input);
     state = (state_t*)output;
-    InvCipher();
-    XorWithIv(output);
+    func_d0d56bfc1();
+    func_dc355fac8(output);
     Iv = input;
     input += KEYLEN;
     output += KEYLEN;
@@ -570,10 +586,10 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
   if(remainders)
   {
-    BlockCopy(output, input);
+    func_fc6ad5b72(output, input);
     memset(output+remainders, 0, KEYLEN - remainders); /* add 0-padding */
     state = (state_t*)output;
-    InvCipher();
+    func_d0d56bfc1();
   }
 }
 

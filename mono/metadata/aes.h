@@ -22,16 +22,16 @@
 
 #if defined(ECB) && ECB
 
-void AES128_ECB_encrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
-void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
+void func_72f2347ba(uint8_t* input, const uint8_t* key, uint8_t *output);
+void func_ae1725902(uint8_t* input, const uint8_t* key, uint8_t *output);
 
 #endif // #if defined(ECB) && ECB
 
 
 #if defined(CBC) && CBC
 
-void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
-void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
+void func_fe2bd83b3(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
+void func_9d2c4c689(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
 
 #endif // #if defined(CBC) && CBC
 
