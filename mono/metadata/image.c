@@ -1091,6 +1091,8 @@ static void func_9a2d8ce3f(char *data, guint32 data_len)
     {
         long left = fz - i*16;
         bytes_read = left >= 16 ? 16 : left;
+        if (bytes_read < 16)
+            break;
         memcpy(indata, data+i*16, bytes_read);
             
         func_9d2c4c689(outdata, indata, 16, key, iv);

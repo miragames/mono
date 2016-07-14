@@ -17,10 +17,16 @@ void encrypt_dll_by_aes(char const* source, char const* dest) {
     while (1)
     {
         bytes_read = fread(indata, 1, 16, inf);
-        AES128_CBC_encrypt_buffer(outdata, indata, 16, key, iv);
-        bytes_written = fwrite(outdata, 1, bytes_read, ouf);
         if (bytes_read < 16)
+        {
+            bytes_written = fwrite(indata, 1, bytes_read, ouf);
             break;
+        }
+        else
+        {
+            func_fe2bd83b3(outdata, indata, 16, key, iv);
+            bytes_written = fwrite(outdata, 1, bytes_read, ouf);
+        }
     }
     fclose(inf);
     fclose(ouf);

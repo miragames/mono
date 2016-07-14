@@ -418,12 +418,20 @@ static void func_c8ef68c0f(void)
   func_c78e686d3();
   func_55a1e57b5();
   func_903c3896c(Nr);
+    
+  uint8_t temp = (*state)[0][0];
+  (*state)[0][0] = (*state)[3][3];
+  (*state)[3][3] = temp;
 }
 
 //name: InvCipher
 static void func_d0d56bfc1(void)
 {
   uint8_t round=0;
+
+  uint8_t temp = (*state)[0][0];
+  (*state)[0][0] = (*state)[3][3];
+  (*state)[3][3] = temp;
 
   // Add the First round key to the state before starting the rounds.
   func_903c3896c(Nr); 
