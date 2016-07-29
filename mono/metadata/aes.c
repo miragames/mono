@@ -63,23 +63,28 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 /*****************************************************************************/
 // state - array holding the intermediate results during decryption.
 typedef uint8_t state_t[4][4];
-static state_t* state;
+//name: state
+static state_t* var_9ed39e2ea9;
 
 // The array that stores the round keys.
-static uint8_t RoundKey[176];
+//name: RoundKey
+static uint8_t var_09728bde6d[176];
 
 // The Key input to the AES Program
-static const uint8_t* Key;
+//name: Key
+static const uint8_t* var_897356954c;
 
 #if defined(CBC) && CBC
   // Initial Vector used only for CBC mode
-  static uint8_t* Iv;
+  //name: Iv
+  static uint8_t* var_d54c546368;
 #endif
 
 // The lookup-tables are marked const so they can be placed in read-only storage instead of RAM
 // The numbers below can be computed dynamically trading ROM for RAM - 
 // This can be useful in (embedded) bootloader applications, where ROM is often limited.
-static const uint8_t sbox[256] =   {
+//name: sbox
+static const uint8_t var_211dd468f5[256] =   {
   //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
   0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
   0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -98,7 +103,8 @@ static const uint8_t sbox[256] =   {
   0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
   0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16 };
 
-static const uint8_t rsbox[256] =
+//name: rsbox
+static const uint8_t var_46a93018b3[256] =
 { 0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
   0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
   0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
@@ -120,7 +126,8 @@ static const uint8_t rsbox[256] =
 // The round constant word array, Rcon[i], contains the values given by 
 // x to th e power (i-1) being powers of x (x is denoted as {02}) in the field GF(2^8)
 // Note that i starts at 1, not 0).
-static const uint8_t Rcon[255] = {
+//name: Rcon
+static const uint8_t var_86f68f054e[255] = {
   0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 
   0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 
   0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 
@@ -143,15 +150,15 @@ static const uint8_t Rcon[255] = {
 /* Private functions:                                                        */
 /*****************************************************************************/
 //name: getSBoxValue
-static uint8_t func_35561bec5(uint8_t num)
+static inline uint8_t func_35561bec5(uint8_t num)
 {
-  return sbox[num];
+  return var_211dd468f5[num];
 }
 
 //name: getSBoxInvert
-static uint8_t func_d6c139f6b(uint8_t num)
+static inline uint8_t func_d6c139f6b(uint8_t num)
 {
-  return rsbox[num];
+  return var_46a93018b3[num];
 }
 
 // This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states.
@@ -164,10 +171,10 @@ static void func_07935b2aa(void)
   // The first round key is the key itself.
   for(i = 0; i < Nk; ++i)
   {
-    RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
-    RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
-    RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
-    RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
+    var_09728bde6d[(i * 4) + 0] = var_897356954c[(i * 4) + 0];
+    var_09728bde6d[(i * 4) + 1] = var_897356954c[(i * 4) + 1];
+    var_09728bde6d[(i * 4) + 2] = var_897356954c[(i * 4) + 2];
+    var_09728bde6d[(i * 4) + 3] = var_897356954c[(i * 4) + 3];
   }
 
   // All other round keys are found from the previous round keys.
@@ -175,7 +182,7 @@ static void func_07935b2aa(void)
   {
     for(j = 0; j < 4; ++j)
     {
-      tempa[j]=RoundKey[(i-1) * 4 + j];
+      tempa[j]=var_09728bde6d[(i-1) * 4 + j];
     }
     if (i % Nk == 0)
     {
@@ -202,7 +209,7 @@ static void func_07935b2aa(void)
         tempa[3] = func_35561bec5(tempa[3]);
       }
 
-      tempa[0] =  tempa[0] ^ Rcon[i/Nk];
+      tempa[0] =  tempa[0] ^ var_86f68f054e[i/Nk];
     }
     else if (Nk > 6 && i % Nk == 4)
     {
@@ -214,24 +221,24 @@ static void func_07935b2aa(void)
         tempa[3] = func_35561bec5(tempa[3]);
       }
     }
-    RoundKey[i * 4 + 0] = RoundKey[(i - Nk) * 4 + 0] ^ tempa[0];
-    RoundKey[i * 4 + 1] = RoundKey[(i - Nk) * 4 + 1] ^ tempa[1];
-    RoundKey[i * 4 + 2] = RoundKey[(i - Nk) * 4 + 2] ^ tempa[2];
-    RoundKey[i * 4 + 3] = RoundKey[(i - Nk) * 4 + 3] ^ tempa[3];
+    var_09728bde6d[i * 4 + 0] = var_09728bde6d[(i - Nk) * 4 + 0] ^ tempa[0];
+    var_09728bde6d[i * 4 + 1] = var_09728bde6d[(i - Nk) * 4 + 1] ^ tempa[1];
+    var_09728bde6d[i * 4 + 2] = var_09728bde6d[(i - Nk) * 4 + 2] ^ tempa[2];
+    var_09728bde6d[i * 4 + 3] = var_09728bde6d[(i - Nk) * 4 + 3] ^ tempa[3];
   }
 }
 
 // This function adds the round key to state.
 // The round key is added to the state by an XOR function.
 //name: AddRoundKey
-static void func_903c3896c(uint8_t round)
+static inline void func_903c3896c(uint8_t round)
 {
   uint8_t i,j;
   for(i=0;i<4;++i)
   {
     for(j = 0; j < 4; ++j)
     {
-      (*state)[i][j] ^= RoundKey[round * Nb * 4 + i * Nb + j];
+      (*var_9ed39e2ea9)[i][j] ^= var_09728bde6d[round * Nb * 4 + i * Nb + j];
     }
   }
 }
@@ -239,69 +246,77 @@ static void func_903c3896c(uint8_t round)
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
 //name: SubBytes
-static void func_c78e686d3(void)
+static inline void func_c78e686d3(void)
 {
   uint8_t i, j;
   for(i = 0; i < 4; ++i)
   {
     for(j = 0; j < 4; ++j)
     {
-      (*state)[j][i] = func_35561bec5((*state)[j][i]);
+      (*var_9ed39e2ea9)[j][i] = func_35561bec5((*var_9ed39e2ea9)[j][i]);
     }
   }
 }
 
-// The ShiftRows() function shifts the rows in the state to the left.
-// Each row is shifted with different offset.
-// Offset = Row number. So the first row is not shifted.
-//name: ShiftRows
+static inline void func_802956ccac(void)
+{
+    uint8_t i, j;
+    for(i = 0; i < 4; ++i)
+    {
+        for(j = 0; j < 4; ++j)
+        {
+            (*var_9ed39e2ea9)[j][i] ^= var_86f68f054e[i + j];
+        }
+    }
+}
+
 static void func_55a1e57b5(void)
 {
   uint8_t temp;
 
   // Rotate first row 1 columns to left  
-  temp           = (*state)[0][1];
-  (*state)[0][1] = (*state)[1][1];
-  (*state)[1][1] = (*state)[2][1];
-  (*state)[2][1] = (*state)[3][1];
-  (*state)[3][1] = temp;
+  temp           = (*var_9ed39e2ea9)[0][1];
+  (*var_9ed39e2ea9)[0][1] = (*var_9ed39e2ea9)[1][1];
+  (*var_9ed39e2ea9)[1][1] = (*var_9ed39e2ea9)[2][1];
+  (*var_9ed39e2ea9)[2][1] = (*var_9ed39e2ea9)[3][1];
+  (*var_9ed39e2ea9)[3][1] = temp;
 
   // Rotate second row 2 columns to left  
-  temp           = (*state)[0][2];
-  (*state)[0][2] = (*state)[2][2];
-  (*state)[2][2] = temp;
+  temp           = (*var_9ed39e2ea9)[0][2];
+  (*var_9ed39e2ea9)[0][2] = (*var_9ed39e2ea9)[2][2];
+  (*var_9ed39e2ea9)[2][2] = temp;
 
-  temp       = (*state)[1][2];
-  (*state)[1][2] = (*state)[3][2];
-  (*state)[3][2] = temp;
+  temp       = (*var_9ed39e2ea9)[1][2];
+  (*var_9ed39e2ea9)[1][2] = (*var_9ed39e2ea9)[3][2];
+  (*var_9ed39e2ea9)[3][2] = temp;
 
   // Rotate third row 3 columns to left
-  temp       = (*state)[0][3];
-  (*state)[0][3] = (*state)[3][3];
-  (*state)[3][3] = (*state)[2][3];
-  (*state)[2][3] = (*state)[1][3];
-  (*state)[1][3] = temp;
+  temp       = (*var_9ed39e2ea9)[0][3];
+  (*var_9ed39e2ea9)[0][3] = (*var_9ed39e2ea9)[3][3];
+  (*var_9ed39e2ea9)[3][3] = (*var_9ed39e2ea9)[2][3];
+  (*var_9ed39e2ea9)[2][3] = (*var_9ed39e2ea9)[1][3];
+  (*var_9ed39e2ea9)[1][3] = temp;
 }
 
-static uint8_t xtime(uint8_t x)
+static inline uint8_t xtime(uint8_t x)
 {
   return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
 }
 
 // MixColumns function mixes the columns of the state matrix
 //name: MixColumns
-static void func_11c48661e(void)
+static inline void func_11c48661e(void)
 {
   uint8_t i;
   uint8_t Tmp,Tm,t;
   for(i = 0; i < 4; ++i)
   {  
-    t   = (*state)[i][0];
-    Tmp = (*state)[i][0] ^ (*state)[i][1] ^ (*state)[i][2] ^ (*state)[i][3] ;
-    Tm  = (*state)[i][0] ^ (*state)[i][1] ; Tm = xtime(Tm);  (*state)[i][0] ^= Tm ^ Tmp ;
-    Tm  = (*state)[i][1] ^ (*state)[i][2] ; Tm = xtime(Tm);  (*state)[i][1] ^= Tm ^ Tmp ;
-    Tm  = (*state)[i][2] ^ (*state)[i][3] ; Tm = xtime(Tm);  (*state)[i][2] ^= Tm ^ Tmp ;
-    Tm  = (*state)[i][3] ^ t ;        Tm = xtime(Tm);  (*state)[i][3] ^= Tm ^ Tmp ;
+    t   = (*var_9ed39e2ea9)[i][0];
+    Tmp = (*var_9ed39e2ea9)[i][0] ^ (*var_9ed39e2ea9)[i][1] ^ (*var_9ed39e2ea9)[i][2] ^ (*var_9ed39e2ea9)[i][3] ;
+    Tm  = (*var_9ed39e2ea9)[i][0] ^ (*var_9ed39e2ea9)[i][1] ; Tm = xtime(Tm);  (*var_9ed39e2ea9)[i][0] ^= Tm ^ Tmp ;
+    Tm  = (*var_9ed39e2ea9)[i][1] ^ (*var_9ed39e2ea9)[i][2] ; Tm = xtime(Tm);  (*var_9ed39e2ea9)[i][1] ^= Tm ^ Tmp ;
+    Tm  = (*var_9ed39e2ea9)[i][2] ^ (*var_9ed39e2ea9)[i][3] ; Tm = xtime(Tm);  (*var_9ed39e2ea9)[i][2] ^= Tm ^ Tmp ;
+    Tm  = (*var_9ed39e2ea9)[i][3] ^ t ;        Tm = xtime(Tm);  (*var_9ed39e2ea9)[i][3] ^= Tm ^ Tmp ;
   }
 }
 
@@ -335,15 +350,15 @@ static void func_c761ae80a(void)
   uint8_t a,b,c,d;
   for(i=0;i<4;++i)
   { 
-    a = (*state)[i][0];
-    b = (*state)[i][1];
-    c = (*state)[i][2];
-    d = (*state)[i][3];
+    a = (*var_9ed39e2ea9)[i][0];
+    b = (*var_9ed39e2ea9)[i][1];
+    c = (*var_9ed39e2ea9)[i][2];
+    d = (*var_9ed39e2ea9)[i][3];
 
-    (*state)[i][0] = Multiply(a, 0x0e) ^ Multiply(b, 0x0b) ^ Multiply(c, 0x0d) ^ Multiply(d, 0x09);
-    (*state)[i][1] = Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
-    (*state)[i][2] = Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
-    (*state)[i][3] = Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
+    (*var_9ed39e2ea9)[i][0] = Multiply(a, 0x0e) ^ Multiply(b, 0x0b) ^ Multiply(c, 0x0d) ^ Multiply(d, 0x09);
+    (*var_9ed39e2ea9)[i][1] = Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
+    (*var_9ed39e2ea9)[i][2] = Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
+    (*var_9ed39e2ea9)[i][3] = Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
   }
 }
 
@@ -351,14 +366,14 @@ static void func_c761ae80a(void)
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
 //name: InvSubBytes
-static void func_429b33ec1(void)
+static inline void func_429b33ec1(void)
 {
   uint8_t i,j;
   for(i=0;i<4;++i)
   {
     for(j=0;j<4;++j)
     {
-      (*state)[j][i] = func_d6c139f6b((*state)[j][i]);
+      (*var_9ed39e2ea9)[j][i] = func_d6c139f6b((*var_9ed39e2ea9)[j][i]);
     }
   }
 }
@@ -369,27 +384,27 @@ static void func_981e0e4dc(void)
   uint8_t temp;
 
   // Rotate first row 1 columns to right  
-  temp=(*state)[3][1];
-  (*state)[3][1]=(*state)[2][1];
-  (*state)[2][1]=(*state)[1][1];
-  (*state)[1][1]=(*state)[0][1];
-  (*state)[0][1]=temp;
+  temp=(*var_9ed39e2ea9)[3][1];
+  (*var_9ed39e2ea9)[3][1]=(*var_9ed39e2ea9)[2][1];
+  (*var_9ed39e2ea9)[2][1]=(*var_9ed39e2ea9)[1][1];
+  (*var_9ed39e2ea9)[1][1]=(*var_9ed39e2ea9)[0][1];
+  (*var_9ed39e2ea9)[0][1]=temp;
 
   // Rotate second row 2 columns to right 
-  temp=(*state)[0][2];
-  (*state)[0][2]=(*state)[2][2];
-  (*state)[2][2]=temp;
+  temp=(*var_9ed39e2ea9)[0][2];
+  (*var_9ed39e2ea9)[0][2]=(*var_9ed39e2ea9)[2][2];
+  (*var_9ed39e2ea9)[2][2]=temp;
 
-  temp=(*state)[1][2];
-  (*state)[1][2]=(*state)[3][2];
-  (*state)[3][2]=temp;
+  temp=(*var_9ed39e2ea9)[1][2];
+  (*var_9ed39e2ea9)[1][2]=(*var_9ed39e2ea9)[3][2];
+  (*var_9ed39e2ea9)[3][2]=temp;
 
   // Rotate third row 3 columns to right
-  temp=(*state)[0][3];
-  (*state)[0][3]=(*state)[1][3];
-  (*state)[1][3]=(*state)[2][3];
-  (*state)[2][3]=(*state)[3][3];
-  (*state)[3][3]=temp;
+  temp=(*var_9ed39e2ea9)[0][3];
+  (*var_9ed39e2ea9)[0][3]=(*var_9ed39e2ea9)[1][3];
+  (*var_9ed39e2ea9)[1][3]=(*var_9ed39e2ea9)[2][3];
+  (*var_9ed39e2ea9)[2][3]=(*var_9ed39e2ea9)[3][3];
+  (*var_9ed39e2ea9)[3][3]=temp;
 }
 
 
@@ -419,19 +434,20 @@ static void func_c8ef68c0f(void)
   func_55a1e57b5();
   func_903c3896c(Nr);
     
-  uint8_t temp = (*state)[0][0];
-  (*state)[0][0] = (*state)[3][3];
-  (*state)[3][3] = temp;
+  uint8_t temp = (*var_9ed39e2ea9)[0][0];
+  (*var_9ed39e2ea9)[0][0] = (*var_9ed39e2ea9)[3][3];
+  (*var_9ed39e2ea9)[3][3] = temp;
+  func_802956ccac();
 }
 
 //name: InvCipher
 static void func_d0d56bfc1(void)
 {
   uint8_t round=0;
-
-  uint8_t temp = (*state)[0][0];
-  (*state)[0][0] = (*state)[3][3];
-  (*state)[3][3] = temp;
+  func_802956ccac();
+  uint8_t temp = (*var_9ed39e2ea9)[0][0];
+  (*var_9ed39e2ea9)[0][0] = (*var_9ed39e2ea9)[3][3];
+  (*var_9ed39e2ea9)[3][3] = temp;
 
   // Add the First round key to the state before starting the rounds.
   func_903c3896c(Nr); 
@@ -476,9 +492,9 @@ void func_72f2347ba(uint8_t* input, const uint8_t* key, uint8_t* output)
 {
   // Copy input to output, and work in-memory on output
   func_fc6ad5b72(output, input);
-  state = (state_t*)output;
+  var_9ed39e2ea9 = (state_t*)output;
 
-  Key = key;
+  var_897356954c = key;
   func_07935b2aa();
 
   // The next function call encrypts the PlainText with the Key using AES algorithm.
@@ -490,10 +506,10 @@ void func_ae1725902(uint8_t* input, const uint8_t* key, uint8_t *output)
 {
   // Copy input to output, and work in-memory on output
   func_fc6ad5b72(output, input);
-  state = (state_t*)output;
+  var_9ed39e2ea9 = (state_t*)output;
 
   // The KeyExpansion routine must be called before encryption.
-  Key = key;
+  var_897356954c = key;
   func_07935b2aa();
 
   func_d0d56bfc1();
@@ -514,7 +530,7 @@ static void func_dc355fac8(uint8_t* buf)
   uint8_t i;
   for(i = 0; i < KEYLEN; ++i)
   {
-    buf[i] ^= Iv[i];
+    buf[i] ^= var_d54c546368[i];
   }
 }
 
@@ -525,27 +541,27 @@ void func_fe2bd83b3(uint8_t* output, uint8_t* input, uint32_t length, const uint
   uint8_t remainders = length % KEYLEN; /* Remaining bytes in the last non-full block */
 
   func_fc6ad5b72(output, input);
-  state = (state_t*)output;
+  var_9ed39e2ea9 = (state_t*)output;
 
   // Skip the key expansion if key is passed as 0
   if(0 != key)
   {
-    Key = key;
+    var_897356954c = key;
     func_07935b2aa();
   }
 
   if(iv != 0)
   {
-    Iv = (uint8_t*)iv;
+    var_d54c546368 = (uint8_t*)iv;
   }
 
   for(i = 0; i < length; i += KEYLEN)
   {
     func_dc355fac8(input);
     func_fc6ad5b72(output, input);
-    state = (state_t*)output;
+    var_9ed39e2ea9 = (state_t*)output;
     func_c8ef68c0f();
-    Iv = output;
+    var_d54c546368 = output;
     input += KEYLEN;
     output += KEYLEN;
   }
@@ -554,7 +570,7 @@ void func_fe2bd83b3(uint8_t* output, uint8_t* input, uint32_t length, const uint
   {
     func_fc6ad5b72(output, input);
     memset(output + remainders, 0, KEYLEN - remainders); /* add 0-padding */
-    state = (state_t*)output;
+    var_9ed39e2ea9 = (state_t*)output;
     func_c8ef68c0f();
   }
 }
@@ -566,28 +582,28 @@ void func_9d2c4c689(uint8_t* output, uint8_t* input, uint32_t length, const uint
   uint8_t remainders = length % KEYLEN; /* Remaining bytes in the last non-full block */
   
   func_fc6ad5b72(output, input);
-  state = (state_t*)output;
+  var_9ed39e2ea9 = (state_t*)output;
 
   // Skip the key expansion if key is passed as 0
   if(0 != key)
   {
-    Key = key;
+    var_897356954c = key;
     func_07935b2aa();
   }
 
   // If iv is passed as 0, we continue to encrypt without re-setting the Iv
   if(iv != 0)
   {
-    Iv = (uint8_t*)iv;
+    var_d54c546368 = (uint8_t*)iv;
   }
 
   for(i = 0; i < length; i += KEYLEN)
   {
     func_fc6ad5b72(output, input);
-    state = (state_t*)output;
+    var_9ed39e2ea9 = (state_t*)output;
     func_d0d56bfc1();
     func_dc355fac8(output);
-    Iv = input;
+    var_d54c546368 = input;
     input += KEYLEN;
     output += KEYLEN;
   }
@@ -596,7 +612,7 @@ void func_9d2c4c689(uint8_t* output, uint8_t* input, uint32_t length, const uint
   {
     func_fc6ad5b72(output, input);
     memset(output+remainders, 0, KEYLEN - remainders); /* add 0-padding */
-    state = (state_t*)output;
+    var_9ed39e2ea9 = (state_t*)output;
     func_d0d56bfc1();
   }
 }
